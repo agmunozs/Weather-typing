@@ -1,1 +1,1 @@
-# WTpyS2S
+# Weather-typing
