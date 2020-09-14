@@ -1,3 +1,10 @@
+# Flow-dependent Model Diagnostics 
+Several tools for flow-dependent model diagnostics and general weather typing, as part of our contribution to NOAA's Model Diagnostics Task Force (MDTF). More information:
+A Weather-Type-Based Cross-Time-Scale Diagnostic Framework for Coupled Circulation Models 
+Ángel G. Muñoz;  Xiaosong Yang;  Gabriel A. Vecchi;  Andrew W. Robertson;  William F. Cooke
+J. Climate (2017) 30 (22): 8951–8972.
+https://doi.org/10.1175/JCLI-D-17-0115.1
+
 # Weather-typing
 Several weather-typing codes, in Matlab and Python.
 
