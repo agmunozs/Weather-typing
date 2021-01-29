@@ -1,4 +1,4 @@
-# Flow-dependent Model Diagnostics 
+# Flow-dependent Cross-timescale Model Diagnostics 
 Several tools for flow-dependent model diagnostics and general weather typing, as part of our contribution to NOAA's Model Diagnostics Task Force (MDTF). More information:
 A Weather-Type-Based Cross-Time-Scale Diagnostic Framework for Coupled Circulation Models 
 Ángel G. Muñoz;  Xiaosong Yang;  Gabriel A. Vecchi;  Andrew W. Robertson;  William F. Cooke
