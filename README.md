@@ -9,7 +9,7 @@ https://doi.org/10.1175/JCLI-D-17-0115.1
 Several weather-typing codes, in Matlab and Python.
 
 ## PyWR
-Python script to compute weather types/regimes using K-means. Model weather types are projected into the observed ones in the EOF space.
+Python scripts and Jupyter notebooks to compute weather types/regimes diagnostics using K-means. Model weather types are projected (or not) into the observed ones in the EOF space.
 ### Authors:
 Ángel G. Muñoz (agmunoz@iri.columbia.edu), Andrew W. Robertson (awr@iri.columbia.edu) and James Doss-Gollin (james.doss-gollin@columbia.edu)
 
