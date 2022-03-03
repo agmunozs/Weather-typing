@@ -146,3 +146,20 @@ def loop_kmeans(X: np.ndarray, n_cluster: int, n_sim: int) -> Tuple[np.ndarray, 
         centroids[i, :, :] = km.cluster_centers_
         w_types[i, :] = km.labels_
     return centroids, w_types
+
+def resort_labels(old_labels):
+    """Re-sort cluster labels
+    Takes in x, a vector of cluster labels, and re-orders them so that
+    the lowest number is the most common, and the highest number
+    the least common
+    Args:
+        old_labels: the previous labels of the clusters
+    Returns:
+        new_labels: the new cluster labels, ranked by frequency of occurrence
+    """
+    old_labels = np.int_(old_labels)
+    labels_from = np.unique(old_labels).argsort()
+    counts = np.array([np.sum(old_labels == xi) for xi in labels_from])
+    orders = counts.argsort()[::-1].argsort()
+    new_labels = orders[labels_from[old_labels]] + 1
+    return new_labels
