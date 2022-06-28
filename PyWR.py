@@ -526,9 +526,9 @@ def procrustesAnalysis(WTmod,WTrea,model,reanalysis='MERRA',smooth='SingleDay',p
 #Plotting / graphing functions
 
 def plot_reaVSmod(WTmod,WTrea,model,reanalysis='MERRA',savefig=False):
-    """Plot reanalysis and model datasets
+    """Plot reanalysis and model weather type datasets.
     
-    Plots smoothed reanalysis data and 
+    Plots weather types of smoothed reanalysis data and 
     smoothed, interpolated model datasets as contour maps.
     
     Parameters
