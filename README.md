@@ -10,6 +10,9 @@ Several weather-typing codes, in Matlab and Python.
 
 ## PyWR
 Python scripts and Jupyter notebooks to compute weather types/regimes diagnostics using K-means. Model weather types are projected (or not) into the observed ones in the EOF space.
+
+Procrustes decomposition and callibration of computed weather types. Plotting functionality to view weather types comparison (reanalysis vs model data), weather types decomposition and callibration data for each computed weather type.
+
 ### Authors:
 Ángel G. Muñoz (agmunoz@iri.columbia.edu), Drew M. Resnick (drewr@iri.columbia.edu)
 ### Collaborators:
