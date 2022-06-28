@@ -604,7 +604,7 @@ def plot_reaVSmod(WTmod,WTrea,model,reanalysis='MERRA',savefig=False):
     return plt.show()
     
 
-def plot_procrustesCorrection(WTf,savefig=False):
+def plot_procrustesCallibration(WTf,savefig=False):
     """Plot the WTf output of the procrustes analysis.
     
     Plot the corrected weather type model outputs against the 
@@ -625,7 +625,7 @@ def plot_procrustesCorrection(WTf,savefig=False):
     Notes
     -----
     If savefig=True, figure will be saved to current directory as 
-    'ProcrustesCorrection_ + {model} + .pdf'
+    'ProcrustesCallibration_ + {model} + .pdf'
     """
     plt.rcParams.update({'font.size': 20})
     countlev=20
@@ -669,10 +669,10 @@ def plot_procrustesCorrection(WTf,savefig=False):
         ax.add_feature(feature.BORDERS)
 
     if savefig == True:
-        plt.savefig('ProcrustesCorrection_'+ model +'.pdf')
+        plt.savefig('ProcrustesCallibration_'+ model +'.pdf')
     plt.show()
     
-def plot_procrustesAnalysis(Procrustes,savefig=False):
+def plot_procrustesDecomposition(Procrustes,savefig=False):
     """Plot results of procrustes analysis.
     
     Contour plots which show the different elements of the 
@@ -692,7 +692,7 @@ def plot_procrustesAnalysis(Procrustes,savefig=False):
     Notes
     -----
     If savefig=True, figure will be saved to current directory as 
-    'ProcrustesAnalysis_ + {model} + .pdf' 
+    'ProcrustesDecomposition_ + {model} + .pdf' 
     
     `Procrustes` includes the original model weather type data, as well as the 
     scale,rotation, and translation data used to correct the model 
@@ -741,6 +741,6 @@ def plot_procrustesAnalysis(Procrustes,savefig=False):
         ax.add_feature(feature.BORDERS)
         
     if savefig == True:
-        plt.savefig('ProcrustesAnalysis_'+ model +'.pdf')
+        plt.savefig('ProcrustesDecomposition_'+ model +'.pdf')
     plt.show()
     
