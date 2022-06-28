@@ -1,6 +1,9 @@
-#PyWR.py (version1.1) -- 27 Oct 2020
-#Python functions for weather typing (using K-means) and flow-dependent model diagnostics
-#Authors: ÁG Muñoz (agmunoz@iri.columbia.edu), James Doss-Gollin, AW Robertson (awr@iri.columbia.edu)
+#PyWR.py (version1.2) -- 28 June 2022
+#Python functions for:
+#    Weather typing (using K-means) and flow-dependent model diagnostics
+#    Procrustes decomposition and callibration of weather typing
+#    Plotting for weather typing, procrustes decomposition and callibration
+#Authors: ÁG Muñoz (agmunoz@iri.columbia.edu), DM Resnick (drewr@iri.columbia.edu), James Doss-Gollin, AW Robertson (awr@iri.columbia.edu)
 #The International Research Institute for Climate and Society (IRI)
 #The Earth Institute at Columbia University.
 
@@ -526,10 +529,10 @@ def procrustesAnalysis(WTmod,WTrea,model,reanalysis='MERRA',smooth='SingleDay',p
 #Plotting / graphing functions
 
 def plot_reaVSmod(WTmod,WTrea,model,reanalysis='MERRA',savefig=False):
-    """Plot reanalysis and model datasets
+    """Plot weather type date comparison between reanalysis and model data.
     
     Plots smoothed reanalysis data and 
-    smoothed, interpolated model datasets as contour maps.
+    smoothed, interpolated model datasets as contour maps for each weather type.
     
     Parameters
     ----------
