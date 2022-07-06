@@ -25,7 +25,7 @@ Matlab scripts to compute weather types/regimes using K-means. Model weather typ
 
 ## Function documentation
 In order to view the html function documentation, do the following in your terminal:
-1. Make sure you have [sphinx](https://anaconda.org/conda-forge/sphinx) installed.
+1. Make sure you have [sphinx](https://anaconda.org/conda-forge/sphinx) and [sphinx-rtd-theme](https://pypi.org/project/sphinx-rtd-theme/) installed.
 2. Navigate to the `Weather-typing/docs/` subdirectory within the repository.
 3. Edit line 15 of `source/conf.py` to be the path of the top level of the repository on your computer.
 4. In `docs/`, run the command:
