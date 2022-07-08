@@ -525,6 +525,92 @@ def procrustesAnalysis(WTmod,WTrea,model,reanalysis='MERRA',smooth='SingleDay',p
 
 #Plotting / graphing functions
 
+
+def plot_WTcomposite(reanalysis, t2m, rainfall, wt_unique, wt, map_proj=ccrs.PlateCarree(), data_proj=ccrs.PlateCarree(), figsize=(14,8), savefig=True):
+    # Set up the Figure
+    plt.rcParams.update({'font.size': 12})
+    fig, axes = plt.subplots(
+            nrows=3, ncols=len(wt_unique), subplot_kw={'projection': map_proj}, 
+            figsize=figsize, sharex=True, sharey=True
+        )
+
+    # Loop through
+    for i,w in enumerate(wt_unique):
+        def selector(ds):
+            times = wt.loc[wt['WT'] == w].index
+            typ = np.in1d(ds.unstack('time')['T'], times)
+            ds = ds.sel(time = np.in1d(ds.unstack('time')['T'], times))
+            ds = ds.mean(dim = 'time')
+            return(ds)
+
+        # Top row: geopotential height anomalies
+        ax = axes[0, i]
+        ax.set_title('WT {}: {:.1%} of days'.format(w, wt_counts.values[i]))
+        C0 = selector(reanalysis['adif']).unstack('grid').plot.contourf(
+            transform = data_proj,
+            ax=ax,
+            cmap='PuOr',
+            extend="both",
+            levels=np.linspace(-2e2, 2e2, 21),
+            add_colorbar=False, #could also make these function inputs so users could specify? but optional inputs
+            add_labels=False
+        )
+        ax.coastlines()
+        ax.add_feature(feature.BORDERS)
+        
+        # Middle row: rainfall anomalies
+        ax = axes[1, i]
+        C1 = selector(rainfall['adif']).unstack('grid').plot.contourf(
+            transform = data_proj,
+            ax=ax,
+            cmap = 'BrBG',
+            extend="both",
+            levels=np.linspace(-2, 2, 13),
+            add_colorbar=False,
+            add_labels=False
+        )
+        ax.coastlines()
+        ax.add_feature(feature.BORDERS)
+
+        #Bottom row: tepmperature anomalies
+        ax = axes[2, i]
+        C2 = selector(t2m['asum']).unstack('grid').plot.contourf(
+            transform = data_proj,
+            ax=ax,
+            cmap = 'RdBu_r',
+            extend="both",
+            levels=np.linspace(-3, 3, 13),
+            add_colorbar=False,
+            add_labels=False
+        )
+        ax.coastlines()
+        ax.add_feature(feature.BORDERS)
+        ax.tick_params(colors='b')
+        
+    #Add Colorbar
+    plt.tight_layout()
+    fig.subplots_adjust(right=0.94)
+    cax0 = fig.add_axes([0.97, 0.65, 0.0075, 0.3])
+    cax1 = fig.add_axes([0.97, 0.33, 0.0075, 0.3])
+    cax2 = fig.add_axes([0.97, 0.01, 0.0075, 0.3])
+    cbar0 = fig.colorbar(C0, cax = cax0)
+    cbar0.formatter.set_powerlimits((4, 4))
+    cbar0.update_ticks()
+    cbar0.set_label(r'$zg_{500}$ anomaly [$m^2$/$s^2$]', rotation=270)
+    cbar0.ax.get_yaxis().labelpad = 20
+    cbar1 = fig.colorbar(C1, cax=cax1)
+    cbar1.set_label('Precip. anomaly [mm/d]', rotation=270)
+    cbar1.ax.get_yaxis().labelpad = 20
+    cbar2 = fig.colorbar(C2, cax=cax2)
+    cbar2.set_label('T2m anomaly [$^o$C]', rotation=270)
+    cbar2.ax.get_yaxis().labelpad = 20
+        
+    if savefig == True:
+        fig.savefig('figs/wt_composite.pdf', bbox_inches='tight')
+    
+    return plt.show()
+
+
 def plot_reaVSmod(WTmod,WTrea,model,reanalysis='MERRA',savefig=False):
     """Plot reanalysis and model weather type datasets.
     
@@ -596,10 +682,9 @@ def plot_reaVSmod(WTmod,WTrea,model,reanalysis='MERRA',savefig=False):
     for ax in p.axes.flat:
         ax.coastlines()
         ax.add_feature(feature.BORDERS)
-        #ax.set_extent([xmin, xmax, ymin, ymax])
 
     if savefig == True:
-        plt.savefig("plot_reaVSmod.png")
+        plt.savefig("figs/plot_reaVSmod.png")
         
     return plt.show()
     
@@ -669,7 +754,7 @@ def plot_procrustesCallibration(WTf,savefig=False):
         ax.add_feature(feature.BORDERS)
 
     if savefig == True:
-        plt.savefig('ProcrustesCallibration_'+ model +'.pdf')
+        plt.savefig('figs/ProcrustesCallibration_'+ model +'.pdf')
     plt.show()
     
 def plot_procrustesDecomposition(Procrustes,savefig=False):
@@ -741,6 +826,6 @@ def plot_procrustesDecomposition(Procrustes,savefig=False):
         ax.add_feature(feature.BORDERS)
         
     if savefig == True:
-        plt.savefig('ProcrustesDecomposition_'+ model +'.pdf')
+        plt.savefig('figs/ProcrustesDecomposition_'+ model +'.pdf')
     plt.show()
     
