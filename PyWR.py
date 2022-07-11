@@ -526,7 +526,7 @@ def procrustesAnalysis(WTmod,WTrea,model,reanalysis='MERRA',smooth='SingleDay',p
 #Plotting / graphing functions
 
 
-def plot_WTcomposite(reanalysis, t2m, rainfall, wt_unique, wt, map_proj=ccrs.PlateCarree(), data_proj=ccrs.PlateCarree(), figsize=(14,8), savefig=True):
+def plot_WTcomposite(reanalysis, t2m, rainfall, wt_unique, wt, wt_counts, map_proj=ccrs.PlateCarree(), data_proj=ccrs.PlateCarree(), figsize=(14,8), savefig=True):
     # Set up the Figure
     plt.rcParams.update({'font.size': 12})
     fig, axes = plt.subplots(
