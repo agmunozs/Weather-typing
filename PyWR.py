@@ -526,7 +526,55 @@ def procrustesAnalysis(WTmod,WTrea,model,reanalysis='MERRA',smooth='SingleDay',p
 #Plotting / graphing functions
 
 
-def plot_WTcomposite(reanalysis, t2m, rainfall, wt_unique, wt, wt_counts, map_proj=ccrs.PlateCarree(), data_proj=ccrs.PlateCarree(), figsize=(14,8), savefig=True):
+def plot_WTcomposite(reanalysis, t2m, rainfall, wt_unique, wt, wt_counts, map_proj=ccrs.PlateCarree(), data_proj=ccrs.PlateCarree(), figsize=(14,8), windArrows=False, uwnd=[], vwnd=[], savefig=True):
+    """Plot composite of WTs for available input variables.
+    
+    Using the outputs of the weather typing analysis, generate contour plots for the
+    reanalysis geopotential height data, temperature, and rainfall anomalies. 
+    Option to render wind vector data overlay on plots.
+    
+    Parameters
+    ----------
+    reanalysis : Dataset
+        Reanalysis dataset.
+    t2m : Dataset
+        Temperature dataset.
+    rainfall : Dataset
+        Rainfall dataset.
+    wt_unique : ndarray
+        Unique reanalysis value for each lat/lng value for each weather type, 
+        calculated as the mean reanalysis value grouped by `WT` and averaged over time. 
+    wt : DataFrame
+        Dataframe containing the weather type for each time step.
+    wt_counts : Series
+        Series containing the proportion which each weather type is present in the data.
+    map_proj : cartopy.crs projection, optional
+        Projection the map should be displayed in.
+    data_proj : cartopy.crs projection, optional
+        Projection the data is in.
+    figsize : tuple, optional
+        Size of the figure the function returns, defaults as a "14 x 8" size figure.
+    windArrows : Bool, optional
+        If wind vector data is available, set to "True" to display wind arrows 
+        on the reanalysis plots in the figure. 
+    uwnd : Dataset, optional
+        The u component vector for wind.
+    vwnd : Dataset, optional
+        The w component vector for wind.
+    savefig : Bool, optional
+        Determins if plot will be saved.
+    Returns
+    -------
+    plt.show()
+        Composite figure showing plots of weather type data for pressure height (reanalysis),
+        precipitation, and temperature anomalies, for each weather type. 
+        Also displays percent that each WT is prsent in totals days of each dataset. 
+    Notes
+    -----
+    The uwnd and vwnd parameters only need to be set if `windArrows` is set to `True`.
+    
+    If savefig=True, figure will be saved to current directory as "figs/wt_composite.pdf"
+    """
     # Set up the Figure
     plt.rcParams.update({'font.size': 12})
     fig, axes = plt.subplots(
@@ -636,7 +684,7 @@ def plot_reaVSmod(WTmod,WTrea,model,reanalysis='MERRA',savefig=False):
         Contour plot showing reanalysis and model WTs.
     Notes
     -----
-    If savefig=True, figure will be saved to current directory as 'plot_reaVSmod.png'
+    If savefig=True, figure will be saved to current directory as 'figs/plot_reaVSmod.png'
     """
     WTmod, WTrea = prepareDS_procrustes(WTmod,WTrea)
     
@@ -684,7 +732,7 @@ def plot_reaVSmod(WTmod,WTrea,model,reanalysis='MERRA',savefig=False):
         ax.add_feature(feature.BORDERS)
 
     if savefig == True:
-        plt.savefig("figs/plot_reaVSmod.png")
+        plt.savefig("figs/plot_reaVSmod.pdf")
         
     return plt.show()
     
@@ -710,7 +758,7 @@ def plot_procrustesCallibration(WTf,savefig=False):
     Notes
     -----
     If savefig=True, figure will be saved to current directory as 
-    'ProcrustesCallibration_ + {model} + .pdf'
+    'figs/ProcrustesCallibration_ + {model} + .pdf'
     """
     plt.rcParams.update({'font.size': 20})
     countlev=20
@@ -777,7 +825,7 @@ def plot_procrustesDecomposition(Procrustes,savefig=False):
     Notes
     -----
     If savefig=True, figure will be saved to current directory as 
-    'ProcrustesDecomposition_ + {model} + .pdf' 
+    'figs/ProcrustesDecomposition_ + {model} + .pdf' 
     
     `Procrustes` includes the original model weather type data, as well as the 
     scale,rotation, and translation data used to correct the model 
