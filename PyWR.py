@@ -606,6 +606,19 @@ def plot_WTcomposite(reanalysis, t2m, rainfall, wt_unique, wt, wt_counts, map_pr
         ax.coastlines()
         ax.add_feature(feature.BORDERS)
         
+        if windArrows == True:
+            X = reanalysis['adif'].X
+            Y = reanalysis['adif'].Y
+            U = selector(uwnd).adif.values  
+            V = selector(vwnd).adif.values
+            magnitude = np.sqrt(U**2 + V**2)
+            strongest = magnitude > np.percentile(magnitude, 50)
+            Q = ax.quiver(
+                X[strongest], Y[strongest], U[strongest], V[strongest], 
+                transform=data_proj, 
+                width=0.06, scale=0.8,units='xy'
+            )          
+        
         # Middle row: rainfall anomalies
         ax = axes[1, i]
         C1 = selector(rainfall['adif']).unstack('grid').plot.contourf(
