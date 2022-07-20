@@ -525,73 +525,157 @@ def procrustesAnalysis(WTmod,WTrea,model,reanalysis='MERRA',smooth='SingleDay',p
 
 #Plotting / graphing functions
 
-def shiftedColorMap(cmap, start=0, midpoint=0.5, stop=1.0, name='shiftedcmap'):
-    """ Offset center of colormap
-    
-    Useful for data with a negative min and positive max and you want the
-    middle of the colormap's dynamic range to be at zero.
 
+def plot_WTcomposite(reanalysis, t2m, rainfall, wt_unique, wt, wt_counts, map_proj=ccrs.PlateCarree(), data_proj=ccrs.PlateCarree(), figsize=(14,8), windArrows=False, uwnd=[], vwnd=[], savefig=True):
+    """Plot composite of WTs for available input variables.
+    
+    Using the outputs of the weather typing analysis, generate contour plots for the
+    reanalysis geopotential height data, temperature, and rainfall anomalies. 
+    Option to render wind vector data overlay on plots.
+    
     Parameters
     ----------
-        cmap : matplotlib colormap
-            The matplotlib colormap to be altered.
-        start : float, optional
-            Offset from lowest point in the colormap's range.
-            Defaults to 0.0 (no lower offset). 
-            Should be between 0.0 and `midpoint`.
-        midpoint : float, optional 
-            The new center of the colormap. 
-            Defaults to 0.5 (no shift). 
-            Should be between 0.0 and 1.0. 
-        stop : float, optional 
-            Offset from highest point in the colormap's range.
-            Defaults to 1.0 (no upper offset). 
-            Should be between `midpoint` and 1.0.
+    reanalysis : Dataset
+        Reanalysis dataset.
+    t2m : Dataset
+        Temperature dataset.
+    rainfall : Dataset
+        Rainfall dataset.
+    wt_unique : ndarray
+        Unique reanalysis value for each lat/lng value for each weather type, 
+        calculated as the mean reanalysis value grouped by `WT` and averaged over time. 
+    wt : DataFrame
+        Dataframe containing the weather type for each time step.
+    wt_counts : Series
+        Series containing the proportion which each weather type is present in the data.
+    map_proj : cartopy.crs projection, optional
+        Projection the map should be displayed in.
+    data_proj : cartopy.crs projection, optional
+        Projection the data is in.
+    figsize : tuple, optional
+        Size of the figure the function returns, defaults as a "14 x 8" size figure.
+    windArrows : Bool, optional
+        If wind vector data is available, set to "True" to display wind arrows 
+        on the reanalysis plots in the figure. 
+    uwnd : Dataset, optional
+        The u component vector for wind.
+    vwnd : Dataset, optional
+        The w component vector for wind.
+    savefig : Bool, optional
+        Determins if plot will be saved.
     Returns
     -------
-    newcmap : matplotlib colormap
-        New colormap that can be used for plotting.  
+    plt.show()
+        Composite figure showing plots of weather type data for pressure height (reanalysis),
+        precipitation, and temperature anomalies, for each weather type. 
+        Also displays percent that each WT is prsent in totals days of each dataset. 
     Notes
     -----
-    For midpoint, in general it should be  1 - vmax / (vmax + abs(vmin)) 
-        For example if your data range from -15.0 to +5.0 and you want 
-        the center of the colormap at 0.0, `midpoint` should be set to  
-        1 - 5/(5 + 15)) or 0.75
+    The uwnd and vwnd parameters only need to be set if `windArrows` is set to `True`.
+    
+    If savefig=True, figure will be saved to current directory as "figs/wt_composite.pdf"
     """
-    cdict = {
-        'red': [],
-        'green': [],
-        'blue': [],
-        'alpha': []
-    }
+    # Set up the Figure
+    plt.rcParams.update({'font.size': 12})
+    fig, axes = plt.subplots(
+            nrows=3, ncols=len(wt_unique), subplot_kw={'projection': map_proj}, 
+            figsize=figsize, sharex=True, sharey=True
+        )
 
-    # regular index to compute the colors
-    reg_index = np.linspace(start, stop, 257)
+    # Loop through
+    for i,w in enumerate(wt_unique):
+        def selector(ds):
+            times = wt.loc[wt['WT'] == w].index
+            typ = np.in1d(ds.unstack('time')['T'], times)
+            ds = ds.sel(time = np.in1d(ds.unstack('time')['T'], times))
+            ds = ds.mean(dim = 'time')
+            return(ds)
 
-    # shifted index to match the data
-    shift_index = np.hstack([
-        np.linspace(0.0, midpoint, 128, endpoint=False), 
-        np.linspace(midpoint, 1.0, 129, endpoint=True)
-    ])
+        # Top row: geopotential height anomalies
+        ax = axes[0, i]
+        ax.set_title('WT {}: {:.1%} of days'.format(w, wt_counts.values[i]))
+        C0 = selector(reanalysis['adif']).unstack('grid').plot.contourf(
+            transform = data_proj,
+            ax=ax,
+            cmap='PuOr',
+            extend="both",
+            levels=np.linspace(-2e2, 2e2, 21),
+            add_colorbar=False, #could also make these function inputs so users could specify? but optional inputs
+            add_labels=False
+        )
+        ax.coastlines()
+        ax.add_feature(feature.BORDERS)
+        
+        if windArrows == True:
+            X = reanalysis['adif'].X
+            Y = reanalysis['adif'].Y
+            U = selector(uwnd).adif.values  
+            V = selector(vwnd).adif.values
+            magnitude = np.sqrt(U**2 + V**2)
+            strongest = magnitude > np.percentile(magnitude, 50)
+            Q = ax.quiver(
+                X[strongest], Y[strongest], U[strongest], V[strongest], 
+                transform=data_proj, 
+                width=0.06, scale=0.8,units='xy'
+            )          
+        
+        # Middle row: rainfall anomalies
+        ax = axes[1, i]
+        C1 = selector(rainfall['adif']).unstack('grid').plot.contourf(
+            transform = data_proj,
+            ax=ax,
+            cmap = 'BrBG',
+            extend="both",
+            levels=np.linspace(-2, 2, 13),
+            add_colorbar=False,
+            add_labels=False
+        )
+        ax.coastlines()
+        ax.add_feature(feature.BORDERS)
 
-    for ri, si in zip(reg_index, shift_index):
-        r, g, b, a = cmap(ri)
-
-        cdict['red'].append((si, r, r))
-        cdict['green'].append((si, g, g))
-        cdict['blue'].append((si, b, b))
-        cdict['alpha'].append((si, a, a))
-
-    newcmap = matplotlib.colors.LinearSegmentedColormap(name, cdict)
-    plt.register_cmap(cmap=newcmap)
-
-    return newcmap
+        #Bottom row: tepmperature anomalies
+        ax = axes[2, i]
+        C2 = selector(t2m['asum']).unstack('grid').plot.contourf(
+            transform = data_proj,
+            ax=ax,
+            cmap = 'RdBu_r',
+            extend="both",
+            levels=np.linspace(-3, 3, 13),
+            add_colorbar=False,
+            add_labels=False
+        )
+        ax.coastlines()
+        ax.add_feature(feature.BORDERS)
+        ax.tick_params(colors='b')
+        
+    #Add Colorbar
+    plt.tight_layout()
+    fig.subplots_adjust(right=0.94)
+    cax0 = fig.add_axes([0.97, 0.65, 0.0075, 0.3])
+    cax1 = fig.add_axes([0.97, 0.33, 0.0075, 0.3])
+    cax2 = fig.add_axes([0.97, 0.01, 0.0075, 0.3])
+    cbar0 = fig.colorbar(C0, cax = cax0)
+    cbar0.formatter.set_powerlimits((4, 4))
+    cbar0.update_ticks()
+    cbar0.set_label(r'$zg_{500}$ anomaly [$m^2$/$s^2$]', rotation=270)
+    cbar0.ax.get_yaxis().labelpad = 20
+    cbar1 = fig.colorbar(C1, cax=cax1)
+    cbar1.set_label('Precip. anomaly [mm/d]', rotation=270)
+    cbar1.ax.get_yaxis().labelpad = 20
+    cbar2 = fig.colorbar(C2, cax=cax2)
+    cbar2.set_label('T2m anomaly [$^o$C]', rotation=270)
+    cbar2.ax.get_yaxis().labelpad = 20
+        
+    if savefig == True:
+        fig.savefig('figs/wt_composite.pdf', bbox_inches='tight')
+    
+    return plt.show()
 
 
 def plot_reaVSmod(WTmod,WTrea,model,reanalysis='MERRA',savefig=False):
-    """Plot reanalysis and model datasets
+    """Plot reanalysis and model weather type datasets.
     
-    Plots smoothed reanalysis data and 
+    Plots weather types of smoothed reanalysis data and 
     smoothed, interpolated model datasets as contour maps.
     
     Parameters
@@ -613,7 +697,7 @@ def plot_reaVSmod(WTmod,WTrea,model,reanalysis='MERRA',savefig=False):
         Contour plot showing reanalysis and model WTs.
     Notes
     -----
-    If savefig=True, figure will be saved to current directory as 'plot_reaVSmod.png'
+    If savefig=True, figure will be saved to current directory as 'figs/plot_reaVSmod.png'
     """
     WTmod, WTrea = prepareDS_procrustes(WTmod,WTrea)
     
@@ -659,15 +743,14 @@ def plot_reaVSmod(WTmod,WTrea,model,reanalysis='MERRA',savefig=False):
     for ax in p.axes.flat:
         ax.coastlines()
         ax.add_feature(feature.BORDERS)
-        #ax.set_extent([xmin, xmax, ymin, ymax])
 
     if savefig == True:
-        plt.savefig("plot_reaVSmod.png")
+        plt.savefig("figs/plot_reaVSmod.pdf")
         
     return plt.show()
     
 
-def plot_procrustesCorrection(WTf,savefig=False):
+def plot_procrustesCallibration(WTf,savefig=False):
     """Plot the WTf output of the procrustes analysis.
     
     Plot the corrected weather type model outputs against the 
@@ -688,7 +771,7 @@ def plot_procrustesCorrection(WTf,savefig=False):
     Notes
     -----
     If savefig=True, figure will be saved to current directory as 
-    'ProcrustesCorrection_ + {model} + .pdf'
+    'figs/ProcrustesCallibration_ + {model} + .pdf'
     """
     plt.rcParams.update({'font.size': 20})
     countlev=20
@@ -732,10 +815,10 @@ def plot_procrustesCorrection(WTf,savefig=False):
         ax.add_feature(feature.BORDERS)
 
     if savefig == True:
-        plt.savefig('ProcrustesCorrection_'+ model +'.pdf')
+        plt.savefig('figs/ProcrustesCallibration_'+ model +'.pdf')
     plt.show()
     
-def plot_procrustesAnalysis(Procrustes,savefig=False):
+def plot_procrustesDecomposition(Procrustes,savefig=False):
     """Plot results of procrustes analysis.
     
     Contour plots which show the different elements of the 
@@ -755,7 +838,7 @@ def plot_procrustesAnalysis(Procrustes,savefig=False):
     Notes
     -----
     If savefig=True, figure will be saved to current directory as 
-    'ProcrustesAnalysis_ + {model} + .pdf' 
+    'figs/ProcrustesDecomposition_ + {model} + .pdf' 
     
     `Procrustes` includes the original model weather type data, as well as the 
     scale,rotation, and translation data used to correct the model 
@@ -804,6 +887,6 @@ def plot_procrustesAnalysis(Procrustes,savefig=False):
         ax.add_feature(feature.BORDERS)
         
     if savefig == True:
-        plt.savefig('ProcrustesAnalysis_'+ model +'.pdf')
+        plt.savefig('figs/ProcrustesDecomposition_'+ model +'.pdf')
     plt.show()
     
