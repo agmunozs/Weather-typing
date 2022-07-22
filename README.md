@@ -15,6 +15,8 @@ Python scripts and Jupyter notebooks to compute weather types/regimes diagnostic
 ### Collaborators:
 Drew Resnick (drewr@iri.columbia.edu), James Doss-Gollin (james.doss-gollin@columbia.edu)
 
+### Find the documentation here: [PyWR Function Documentation](https://pywr-iri.github.io/Documentation/index.html)
+
 ## Matlab scripts
 Matlab scripts to compute weather types/regimes using K-means. Model weather types are not projected into observed ones.
 ### Authors:
