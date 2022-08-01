@@ -10,10 +10,13 @@ Several weather-typing codes, in Matlab and Python.
 
 ## PyWR
 Python scripts and Jupyter notebooks to compute weather types/regimes diagnostics using K-means. Model weather types are projected (or not) into the observed ones in the EOF space.
+
+Procrustes decomposition and callibration of computed weather types. Plotting functionality to view weather types comparison (reanalysis vs model data), weather types decomposition and callibration data for each computed weather type.
+
 ### Authors:
-Ángel G. Muñoz (agmunoz@iri.columbia.edu)
+Ángel G. Muñoz (agmunoz@iri.columbia.edu), Drew M. Resnick (drewr@iri.columbia.edu)
 ### Collaborators:
-Drew Resnick (drewr@iri.columbia.edu), James Doss-Gollin (james.doss-gollin@columbia.edu)
+Andrew W. Robertson (awr@iri.columbia.edu), James Doss-Gollin (james.doss-gollin@columbia.edu)
 
 ### Find the documentation here: [PyWR Function Documentation](https://pywr-iri.github.io/Documentation/index.html)
 
@@ -22,3 +25,16 @@ Matlab scripts to compute weather types/regimes using K-means. Model weather typ
 ### Authors:
 Ángel G. Muñoz (agmunoz@iri.columbia.edu) modifications to the original code by Andrew W. Robertson (awr@iri.columbia.edu)
 
+## Function documentation
+In order to view the html function documentation, do the following in your terminal:
+1. Make sure you have [sphinx](https://anaconda.org/conda-forge/sphinx) and [sphinx-rtd-theme](https://pypi.org/project/sphinx-rtd-theme/) installed.
+2. Navigate to the `Weather-typing/docs/` subdirectory within the repository.
+3. Edit line 15 of `source/conf.py` to be the path of the top level of the repository on your computer.
+4. In `docs/`, run the command:
+  `make html`
+5. The HTML pages are in `Weather-typing/docs/build/html/`; Navigate to the subdirectory in your computer's finder window and 
+   double click on `index.html` to open in browser.
+
+Once done, you can access the documentation any time by opening `index.html`. However, any time you pull updates from the main repository, it is recommended you remake the documentation in case it was updated. To do this, navigate to `Weather-typing/docs/` and:
+1. Enter `make clean` to remove the outdated `index.html` from the `build/` folder.
+2. Enter `make html` to rebuild the updated `index.html` in the `build/` folder.
